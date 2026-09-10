@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f8fafc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="读谱训练">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+<title>读谱反应训练</title>
+</head>
+<body>
+<main id="app" class="app" tabindex="0">
+<header><div><h1>读谱反应训练</h1><p>看到位置就直接反应音名，不要一个个数 FACE。</p></div><span id="onlinePill" class="pill">离线可用</span></header>
+<section class="controls">
+<label>谱号<select id="clef"><option value="treble">高音谱号</option><option value="bass">低音谱号</option><option value="both">高音 + 低音</option></select></label>
+<label>范围<select id="range"><option value="basic">只练五线内</option><option value="wide">加入加线</option></select></label>
+</section>
+<section class="stats"><div>正确<strong id="correct">0</strong></div><div>错误<strong id="wrong">0</strong></div><div>连对<strong id="streak">0</strong></div><div>近10题平均<strong id="avg">—</strong></div></section>
+<section class="score">
+<div class="scorehead"><span id="clefLabel">高音谱号</span><b id="feedback" aria-live="polite">看到就按</b></div>
+<svg viewBox="0 0 360 180" aria-label="五线谱练习音符">
+<g class="staff"><line x1="58" x2="330" y1="40" y2="40"/><line x1="58" x2="330" y1="60" y2="60"/><line x1="58" x2="330" y1="80" y2="80"/><line x1="58" x2="330" y1="100" y2="100"/><line x1="58" x2="330" y1="120" y2="120"/></g>
+<text id="clefSymbol" x="64" y="112" class="clef">𝄞</text><g id="ledger" class="ledger"></g>
+<ellipse id="note" cx="220" cy="80" rx="12" ry="8" class="note" transform="rotate(-18 220 80)"/>
+<line id="stem" x1="231" x2="231" y1="80" y2="37" class="stem"/></svg>
+</section>
+<section class="answers">
+<button data-note="A">A</button><button data-note="B">B</button><button data-note="C">C</button><button data-note="D">D</button><button data-note="E">E</button><button data-note="F">F</button><button data-note="G">G</button>
+</section>
+<footer><span>先练正确率，再慢慢把反应压到 1 秒以内。</span><button id="reset">重新开始</button></footer>
+</main>
+<script src="./app.js" defer></script>
+</body></html>
