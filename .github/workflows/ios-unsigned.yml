@@ -1,0 +1,62 @@
+name: Build iPhone MIDI app (unsigned)
+
+on:
+  push:
+    branches:
+      - feature/ios-midi
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then brew install xcodegen; fi
+      - name: Generate Xcode project
+        run: |
+          cd ios
+          xcodegen generate --spec project.yml
+      - name: Compile iPhone app without signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -project ios/PianoTrainer.xcodeproj \
+            -scheme PianoTrainer \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$PWD/build" \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee xcodebuild.log
+      - name: Verify offline app resources
+        run: |
+          set -euo pipefail
+          APP="build/Build/Products/Release-iphoneos/PianoTrainer.app"
+          for item in index.html app.js styles.css; do test -f "$APP/$item" || { echo "Missing $item"; exit 1; }; done
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          mkdir -p dist/Payload
+          cp -R build/Build/Products/Release-iphoneos/PianoTrainer.app dist/Payload/
+          cd dist
+          zip -qry PianoTrainer-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: piano-trainer-unsigned-ipa
+          path: dist/PianoTrainer-unsigned.ipa
+          retention-days: 14
+      - name: Upload compile log if build fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-log
+          path: xcodebuild.log
+          if-no-files-found: ignore
