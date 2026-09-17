@@ -1,6 +1,8 @@
 import SwiftUI
 import WebKit
 
+/// The same existing web interface, bundled with the native app so MIDI practice
+/// works even without Wi-Fi. Updates to the native build require a new IPA.
 struct TrainerWebView: UIViewRepresentable {
     @ObservedObject var model: AppModel
 
@@ -16,13 +18,11 @@ struct TrainerWebView: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.scrollView.contentInsetAdjustmentBehavior = .never
 
-        let url = URL(string: "https://kerwyny.github.io/piano-trainer/")!
-        let request = URLRequest(
-            url: url,
-            cachePolicy: .returnCacheDataElseLoad,
-            timeoutInterval: 20
-        )
-        webView.load(request)
+        if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
+            webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        } else {
+            webView.loadHTMLString("<p>缺少训练页面。请重新安装 App。</p>", baseURL: nil)
+        }
         return webView
     }
 
